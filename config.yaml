@@ -7,7 +7,7 @@ ollama_url: "http://localhost:11434"
 model: "qwen2.5-coder:14b"
 context_window: 8192
 temperature: 0.3
-request_timeout_sec: 120
+request_timeout_sec: 300       # 5 min — 14B model cold-loads slowly on 6GB VRAM
 
 # --- Schedule ---
 daily_hour_cap: 8
