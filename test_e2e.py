@@ -204,15 +204,32 @@ and when each is appropriate.
         reset_journal(journal_path)
         return True
 
-    # Run full FSM cycle
+    # Run full FSM cycle with logging enabled
+    import logging
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="  [FSM] %(message)s",
+        stream=sys.stdout,
+    )
+
+    # Override rest day so test always runs full cycle regardless of day
+    config["rest_day"] = "never"
+
     fsm = AcademyFSM(mode="sprint")
+    fsm.config["rest_day"] = "never"  # Also override in FSM's own config copy
     success = fsm.run()
 
     if success:
         sprint_content = read_file(state_dir / "active_sprint.md")
+        is_placeholder = "No sprint generated yet" in sprint_content or len(sprint_content) < 100
+        if is_placeholder:
+            print(f"  [FAIL] Sprint file still contains placeholder ({len(sprint_content)} chars)")
+            print(f"  Content: {sprint_content[:300]}")
+            return False
         print(f"  [PASS] Sprint generated: {len(sprint_content)} chars")
-        print(f"  Sprint preview (first 200 chars):")
-        print(f"  {sprint_content[:200]}...")
+        print(f"\n  --- Sprint Preview (first 500 chars) ---")
+        print(f"  {sprint_content[:500]}")
+        print(f"  --- End Preview ---")
     else:
         print("  [FAIL] Sprint generation failed")
 
