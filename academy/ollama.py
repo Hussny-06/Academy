@@ -88,7 +88,12 @@ class OllamaClient:
                 json=payload,
                 timeout=self.timeout,
             )
-            resp.raise_for_status()
+            if resp.status_code != 200:
+                error_body = resp.text[:500]
+                logger.error(f"Ollama returned {resp.status_code}: {error_body}")
+                raise OllamaError(
+                    f"Ollama returned {resp.status_code}: {error_body}"
+                )
 
             data = resp.json()
             response_text = data.get("response", "")
