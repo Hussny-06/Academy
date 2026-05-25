@@ -192,6 +192,11 @@ class AcademyFSM:
             )
             return "ERROR"
 
+        # Pre-flight: check for CUDA conflicts
+        cuda_warning = self.ollama.check_cuda_conflict()
+        if cuda_warning:
+            logger.warning(cuda_warning)
+
         # Check if journal has content to process
         has_journal = not is_file_empty_or_placeholder(self.journal_path)
 
@@ -391,6 +396,34 @@ class AcademyFSM:
         try:
             self.output = self.ollama.generate(prompt, system_prompt)
             logger.info(f"Sprint generated: {len(self.output)} chars")
+
+            # Quality gate: validate output before writing
+            quality_ok, quality_msg = self._validate_sprint_quality(self.output)
+            if not quality_ok:
+                logger.warning(f"Sprint quality check failed: {quality_msg}")
+                logger.info("Retrying sprint generation (attempt 2/2)...")
+                try:
+                    self.output = self.ollama.generate(prompt, system_prompt)
+                    quality_ok, quality_msg = self._validate_sprint_quality(
+                        self.output
+                    )
+                    if not quality_ok:
+                        logger.warning(
+                            f"Retry also failed quality check: {quality_msg}. "
+                            f"Writing output with warning header."
+                        )
+                        self.output = (
+                            f"> ⚠️ **Quality Warning:** {quality_msg}\n\n"
+                            + self.output
+                        )
+                except OllamaError as retry_err:
+                    logger.error(f"Retry failed: {retry_err}")
+                    # Use the first attempt's output with a warning
+                    self.output = (
+                        f"> ⚠️ **Quality Warning:** {quality_msg} "
+                        f"(retry also failed)\n\n" + self.output
+                    )
+
             return "WRITE_OUTPUT"
         except OllamaError as e:
             self.error_message = f"Sprint generation failed: {e}"
@@ -550,6 +583,48 @@ class AcademyFSM:
     def _is_rest_day(self) -> bool:
         """Check if today is a configured rest day."""
         return get_day_of_week() == self.config.get("rest_day", "sunday")
+
+    def _validate_sprint_quality(self, output: str) -> tuple[bool, str]:
+        """
+        Validate that the LLM output is a usable sprint.
+
+        Checks for:
+        - Minimum length (not empty or trivially short)
+        - No refusal/apology patterns (model declining to respond)
+        - Contains some structure (headers, lists, or code blocks)
+
+        Returns:
+            (is_valid, message) tuple.
+        """
+        # Check 1: Minimum length
+        if len(output.strip()) < 100:
+            return False, f"Output too short ({len(output.strip())} chars, need 100+)"
+
+        output_lower = output.lower()
+
+        # Check 2: Refusal/apology patterns
+        refusal_patterns = [
+            "i cannot",
+            "i can't",
+            "i'm sorry",
+            "i apologize",
+            "as an ai",
+            "i'm unable",
+            "i don't have enough",
+            "i need more context",
+        ]
+        for pattern in refusal_patterns:
+            if pattern in output_lower and len(output.strip()) < 300:
+                return False, f"Model appears to have refused (detected: '{pattern}')"
+
+        # Check 3: Has some structure (at least one header, list item, or code block)
+        has_header = "#" in output
+        has_list = "- " in output or "1." in output
+        has_code = "```" in output
+        if not (has_header or has_list or has_code):
+            return False, "Output lacks structure (no headers, lists, or code blocks)"
+
+        return True, "OK"
 
     def _build_syllabus_summary(self) -> str:
         """Build a compact syllabus progress summary for the prompt."""
