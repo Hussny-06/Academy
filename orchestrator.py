@@ -9,11 +9,15 @@ Usage:
     python orchestrator.py                  # Morning sprint generation
     python orchestrator.py --mode=review    # Evening/weekly review
     python orchestrator.py --status         # Show current state (no LLM call)
+    python orchestrator.py --warmup         # Pre-load model into VRAM
     python orchestrator.py --add-sr "concept" --faculty cpp  # Manually add SR item
 
 Examples:
     # Generate today's sprint (reads journal, calls Ollama, writes sprint):
     python orchestrator.py
+
+    # Pre-load model before first run (avoids cold-start timeout):
+    python orchestrator.py --warmup
 
     # Run weekly review (Sunday evening):
     python orchestrator.py --mode=review
@@ -103,6 +107,14 @@ def show_status(config: dict) -> None:
     model_ok = client.is_model_available() if ollama_ok else False
     print(f"\n  Ollama: {'✅ Running' if ollama_ok else '❌ Not running'}")
     print(f"  Model:  {'✅ Available' if model_ok else '❌ Not pulled'}")
+
+    # CUDA conflict check
+    if ollama_ok:
+        cuda_warning = client.check_cuda_conflict()
+        if cuda_warning:
+            print(f"  GPU:    ⚠️  Conflict detected (close 'ollama run' sessions)")
+        else:
+            print(f"  GPU:    ✅ Available")
 
     # Journal status
     state_dir = resolve_path(config["paths"]["state_dir"])
@@ -200,6 +212,11 @@ def main():
         action="store_true",
         help="Enable verbose (debug) logging",
     )
+    parser.add_argument(
+        "--warmup",
+        action="store_true",
+        help="Pre-load model into VRAM (avoids cold-start delay)",
+    )
 
     args = parser.parse_args()
 
@@ -219,6 +236,25 @@ def main():
             print("Valid faculties: cpp, dsa, ai, scale, interview")
             sys.exit(1)
         add_sr_item(config, args.add_sr, args.faculty)
+        return
+
+    # Handle model warmup
+    if args.warmup:
+        print("\n🔥 Warming up model (loading into VRAM)...")
+        print("   This may take 2-3 minutes on first load.\n")
+        client = OllamaClient(config)
+        if not client.health_check():
+            print("❌ Ollama is not running. Start it first.")
+            sys.exit(1)
+        cuda_warning = client.check_cuda_conflict()
+        if cuda_warning:
+            print(f"   {cuda_warning}\n")
+        success = client.warmup()
+        if success:
+            print("✅ Model is warm and ready. Run 'python orchestrator.py' to generate a sprint.")
+        else:
+            print("❌ Warmup failed. Check if Ollama is running and the model is pulled.")
+            sys.exit(1)
         return
 
     # Setup logging for main execution
