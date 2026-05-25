@@ -99,7 +99,10 @@ pip install -r requirements.txt
 # 3. Pull the model (~9 GB download)
 ollama pull qwen2.5-coder:14b
 
-# 4. Verify everything works
+# 4. Pre-load model into VRAM (avoids cold-start timeout)
+python orchestrator.py --warmup
+
+# 5. Verify everything works
 python orchestrator.py --status
 ```
 
@@ -112,6 +115,7 @@ You should see:
 
   Ollama: ✅ Running
   Model:  ✅ Available
+  GPU:    ✅ Available
   SR Queue: 0 total, 0 due today
 
   Faculty              Progress     Current Week
@@ -170,7 +174,8 @@ The orchestrator reads your journal, checks your position across all 5 syllabi, 
 |---|---|
 | `python orchestrator.py` | Generate daily sprint (reads journal, calls LLM) |
 | `python orchestrator.py --mode=review` | Weekly performance review with velocity metrics |
-| `python orchestrator.py --status` | System dashboard — no LLM call |
+| `python orchestrator.py --status` | System dashboard — no LLM call, shows GPU status |
+| `python orchestrator.py --warmup` | Pre-load model into VRAM (avoids 2-3 min cold start) |
 | `python orchestrator.py --add-sr "concept" --faculty cpp` | Manually add a concept to spaced repetition |
 | `python orchestrator.py -v` | Verbose debug logging |
 
