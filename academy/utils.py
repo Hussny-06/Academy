@@ -241,3 +241,69 @@ def extract_syllabus_progress(syllabus_text: str) -> dict:
         "current_week": current_week or "Not started",
         "current_topics": current_topics[:5],  # Limit to 5 for context window
     }
+
+
+def extract_week_resources(syllabus_text: str, week_title: str) -> str:
+    """
+    Extract the curated Resources section from a specific week in the syllabus.
+
+    Looks for a '- **Resources:**' block under the given week heading and
+    returns all indented resource lines. Returns empty string if no resources found.
+
+    Args:
+        syllabus_text: Full syllabus markdown content.
+        week_title: The week title to search for (e.g., 'Week 1 — C++ Build Systems & Environment').
+
+    Returns:
+        Formatted resource block as markdown string, or empty string.
+    """
+    lines = syllabus_text.splitlines()
+    in_target_week = False
+    in_resources = False
+    resource_lines = []
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Detect week headings (### Week N — Title)
+        if stripped.startswith("### Week") or stripped.startswith("### Weeks"):
+            if in_target_week and resource_lines:
+                break  # We've passed our target week, stop
+            # Check if this is the week we're looking for
+            if week_title and week_title in stripped:
+                in_target_week = True
+                in_resources = False
+            else:
+                in_target_week = False
+                in_resources = False
+            continue
+
+        if not in_target_week:
+            continue
+
+        # Detect the Resources block
+        if "**Resources:**" in stripped:
+            in_resources = True
+            continue
+
+        # Collect resource lines (indented with - or  -)
+        if in_resources:
+            if stripped.startswith("- ") or stripped.startswith("- "):
+                resource_lines.append(stripped)
+            elif stripped.startswith("### ") or stripped.startswith("- **"):
+                # Hit the next section or another bold item, stop
+                break
+            elif not stripped:
+                continue  # Skip blank lines within resources
+            else:
+                break  # Non-resource line, stop
+
+    if not resource_lines:
+        return ""
+
+    result = "### 📚 Verified Resources (from syllabus)\n"
+    for r in resource_lines:
+        result += f"{r}\n"
+    result += "\n> ⚠️ **Only use the links above.** Ignore any other URLs in this sprint — they may be hallucinated by the AI.\n"
+    return result
+

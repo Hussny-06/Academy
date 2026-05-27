@@ -21,10 +21,11 @@
 - [ ] Setting up Google Benchmark & Google Test
 - **Deliverable:** CMake project template with benchmark + test targets
 - **Resources:**
-  - 🎥 [CMake Tutorial for Beginners — Code Tech](https://www.youtube.com/watch?v=nlKcXPUJGwA)
-  - 📄 [CMake Official Tutorial](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
-  - 📖 CS:APP Chapter 7 — Linking (compilation pipeline)
-  - 🎥 [C++ Compilation Process Explained — The Cherno](https://www.youtube.com/watch?v=3tIqpEmWMLI)
+  - 🎥 [How the C++ Compiler Works — The Cherno (17 min)](https://www.youtube.com/watch?v=3tIqpEmWMLI)
+  - 🎥 [How the C++ Linker Works — The Cherno (16 min)](https://www.youtube.com/watch?v=H4s55GgAg0I)
+  - 📄 [CMake Tutorial Step 1: Building an Executable](https://cmake.org/cmake/help/latest/guide/tutorial/A%20Basic%20Starting%20Point.html) — Start here, read only Step 1
+  - 📖 CS:APP Chapter 7 — Linking (explains why build systems exist)
+  - ⏱️ Study time: ~1 hour (watch both Cherno videos + read CMake Step 1)
 
 ### Week 2 — Memory Model: Stack, Heap, Static
 - [ ] Stack frame layout, calling conventions (cdecl, System V AMD64)

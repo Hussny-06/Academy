@@ -35,11 +35,7 @@ sr_items_embedded: <list of concepts woven in>
 ### What You Need to Know
 <3-5 sentence explanation of the core concepts the student needs to understand before starting. Define key terms. Explain WHY this topic matters.>
 
-### Resources (Study These First)
-- 📖 <Specific chapter/section from reference books in the syllabus>
-- 🎥 <Specific YouTube video/channel for visual learners>
-- 📄 <Official documentation link or tutorial>
-- ⏱️ Estimated study time: <N minutes>
+[NOTE: Do NOT generate a Resources section. Verified resources will be automatically appended from the syllabus. Never generate URLs or links — they will be wrong.]
 
 ### Requirements
 1. <Specific requirement with technical detail>

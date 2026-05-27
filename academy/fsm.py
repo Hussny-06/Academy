@@ -25,6 +25,7 @@ from academy.utils import (
     is_file_empty_or_placeholder,
     archive_file,
     extract_syllabus_progress,
+    extract_week_resources,
     today_str,
     now_str,
     get_day_of_week,
@@ -431,12 +432,22 @@ class AcademyFSM:
 
     def _state_write_output(self) -> str:
         """Write the generated sprint to active_sprint.md."""
+        # Strip any LLM-hallucinated resource sections from output
+        cleaned_output = self._strip_llm_resources(self.output)
+
         # Build the sprint file content
         content_parts = [
             f"# Active Sprint — {today_str()}\n",
             f"*Generated at {now_str()}*\n\n",
-            self.output,
+            cleaned_output,
         ]
+
+        # Inject verified resources from the syllabus
+        verified_resources = self._get_verified_resources()
+        if verified_resources:
+            content_parts.append(f"\n{verified_resources}")
+        else:
+            logger.info("No curated resources found for current week in syllabus.")
 
         # Append Friday intel reminder if applicable
         if get_day_of_week() == self.config.get("intel_reminder_day", "friday"):
@@ -583,6 +594,94 @@ class AcademyFSM:
     def _is_rest_day(self) -> bool:
         """Check if today is a configured rest day."""
         return get_day_of_week() == self.config.get("rest_day", "sunday")
+
+    def _strip_llm_resources(self, output: str) -> str:
+        """
+        Strip LLM-hallucinated resource sections from sprint output.
+
+        The LLM often generates fake URLs in 'Resources' sections.
+        We remove these and replace with verified resources from the syllabus.
+        """
+        lines = output.splitlines()
+        cleaned = []
+        skip = False
+
+        for line in lines:
+            stripped = line.strip()
+            # Detect resource section headers (various formats the LLM uses)
+            if any(
+                marker in stripped.lower()
+                for marker in [
+                    "### resources",
+                    "### 📚 resources",
+                    "### 📖 resources",
+                    "resources (study these first)",
+                ]
+            ):
+                skip = True
+                continue
+
+            # Stop skipping when we hit the next section
+            if skip and stripped.startswith("### "):
+                skip = False
+
+            if not skip:
+                cleaned.append(line)
+
+        return "\n".join(cleaned)
+
+    def _get_verified_resources(self) -> str:
+        """
+        Extract curated resources from the current week's syllabus.
+
+        Determines which faculty is being assigned and pulls the
+        resource links from that syllabus's current week.
+        """
+        faculties = self.config.get("faculties", {})
+
+        # Strategy 1: From journal faculty
+        target_faculty = self.context.get("journal_fm", {}).get("faculty")
+
+        # Strategy 2: Detect from sprint output text
+        if not target_faculty and self.output:
+            output_lower = self.output.lower()
+            for key, fconf in faculties.items():
+                # Check both key ("cpp") and name ("C++ / Systems")
+                if key in output_lower or fconf["name"].lower() in output_lower:
+                    target_faculty = key
+                    break
+
+        # Strategy 3: Try all faculties and return first one with resources
+        if not target_faculty:
+            for key in faculties:
+                resources = self._try_extract_resources(key)
+                if resources:
+                    return resources
+            return ""
+
+        return self._try_extract_resources(target_faculty)
+
+    def _try_extract_resources(self, faculty_key: str) -> str:
+        """Try to extract resources for a given faculty key."""
+        faculty_config = self.config.get("faculties", {}).get(faculty_key)
+        if not faculty_config:
+            return ""
+
+        syllabus_path = resolve_path(faculty_config["syllabus"])
+        syllabus_text = read_file(syllabus_path)
+        if not syllabus_text:
+            return ""
+
+        progress = extract_syllabus_progress(syllabus_text)
+        current_week = progress.get("current_week", "")
+
+        if not current_week or current_week == "Not started":
+            return ""
+
+        resources = extract_week_resources(syllabus_text, current_week)
+        if resources:
+            logger.info(f"Injected verified resources from {faculty_key}: {current_week}")
+        return resources
 
     def _validate_sprint_quality(self, output: str) -> tuple[bool, str]:
         """
