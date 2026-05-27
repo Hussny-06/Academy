@@ -20,6 +20,11 @@
 - [ ] Debug vs Release builds, `-O2` vs `-O3` vs `-Os`
 - [ ] Setting up Google Benchmark & Google Test
 - **Deliverable:** CMake project template with benchmark + test targets
+- **Resources:**
+  - 🎥 [CMake Tutorial for Beginners — Code Tech](https://www.youtube.com/watch?v=nlKcXPUJGwA)
+  - 📄 [CMake Official Tutorial](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
+  - 📖 CS:APP Chapter 7 — Linking (compilation pipeline)
+  - 🎥 [C++ Compilation Process Explained — The Cherno](https://www.youtube.com/watch?v=3tIqpEmWMLI)
 
 ### Week 2 — Memory Model: Stack, Heap, Static
 - [ ] Stack frame layout, calling conventions (cdecl, System V AMD64)
@@ -27,6 +32,11 @@
 - [ ] Static vs dynamic storage duration
 - [ ] `sizeof`, alignment, padding rules (`alignof`, `alignas`)
 - **Deliverable:** Program that visualizes memory layout of structs with different padding
+- **Resources:**
+  - 🎥 [Stack vs Heap Memory — The Cherno](https://www.youtube.com/watch?v=wJ1L2nSIV1s)
+  - 📖 CS:APP Chapter 3.4 — Stack frames and calling conventions
+  - 📖 CS:APP Chapter 9 — Virtual Memory
+  - 📄 [Memory Layout of C Programs — GeeksforGeeks](https://www.geeksforgeeks.org/memory-layout-of-c-program/)
 
 ### Week 3 — RAII & Ownership
 - [ ] Construction/destruction sequences (base → derived, member init order)
@@ -34,6 +44,11 @@
 - [ ] `std::unique_ptr` deep dive — implement from scratch
 - [ ] `std::shared_ptr` + `std::weak_ptr` — reference counting internals
 - **Deliverable:** Custom `UniquePtr<T>` with deleter support, full test suite
+- **Resources:**
+  - 🎥 [RAII in C++ — The Cherno](https://www.youtube.com/watch?v=AmjoMSEXfmI)
+  - 🎥 [Smart Pointers — The Cherno](https://www.youtube.com/watch?v=UOB7-B2MfwA)
+  - 📖 *Effective Modern C++* — Items 18-22 (Smart Pointers)
+  - 📄 [cppreference: std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
 
 ### Week 4 — Move Semantics & Value Categories
 - [ ] Lvalues, rvalues, xvalues, prvalues, glvalues
@@ -41,6 +56,11 @@
 - [ ] Perfect forwarding, reference collapsing rules
 - [ ] `noexcept` and its impact on STL container performance
 - **Deliverable:** Custom `Vector<T>` with move constructor/assignment, benchmark vs copy
+- **Resources:**
+  - 🎥 [Move Semantics — The Cherno](https://www.youtube.com/watch?v=ehMg6zvXuMY)
+  - 🎥 [CppCon: Back to Basics Move Semantics — Klaus Iglberger](https://www.youtube.com/watch?v=knEaMpytRMA)
+  - 📖 *Effective Modern C++* — Items 23-30 (Rvalue References & Move Semantics)
+  - 📄 [cppreference: Value categories](https://en.cppreference.com/w/cpp/language/value_category)
 
 ### Week 5 — STL Internals
 - [ ] `std::vector` — growth strategy, iterator invalidation
@@ -48,6 +68,11 @@
 - [ ] `std::string` — SSO (Small String Optimization)
 - [ ] `std::array`, `std::span` (C++20) for zero-cost views
 - **Deliverable:** Implement `std::vector<T>` from raw memory (`placement new`, manual destructor calls)
+- **Resources:**
+  - 🎥 [How std::vector Works — The Cherno](https://www.youtube.com/watch?v=PocJ_JoM7bg)
+  - 🎥 [CppCon: std::unordered_map — Matt Kulukundis](https://www.youtube.com/watch?v=ncHmEUmJZf4)
+  - 📖 *Effective Modern C++* — Item 42 (Emplacement)
+  - 📄 [cppreference: std::vector](https://en.cppreference.com/w/cpp/container/vector)
 
 ### Week 6 — Pointers, References & `const` Correctness
 - [ ] Pointer arithmetic, array decay
@@ -55,6 +80,11 @@
 - [ ] `mutable`, `const_cast` (and why you almost never use it)
 - [ ] Function pointers, `std::function`, lambdas (capture semantics)
 - **Deliverable:** Refactor a 200-line codebase for strict const correctness
+- **Resources:**
+  - 🎥 [Pointers in C++ — The Cherno](https://www.youtube.com/watch?v=DTxHyVn0ODg)
+  - 🎥 [Const in C++ — The Cherno](https://www.youtube.com/watch?v=4fJBrditnJU)
+  - 🎥 [Lambdas in C++ — The Cherno](https://www.youtube.com/watch?v=mWgmBBz0y8c)
+  - 📖 *Effective Modern C++* — Items 31-33 (Lambda Expressions)
 
 ### Week 7 — Virtual Dispatch & Polymorphism Internals
 - [ ] vtable layout, vptr, dynamic dispatch cost
