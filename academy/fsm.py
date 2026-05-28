@@ -449,6 +449,11 @@ class AcademyFSM:
         else:
             logger.info("No curated resources found for current week in syllabus.")
 
+        # Append work directory guidance
+        work_dir_note = self._build_work_dir_note()
+        if work_dir_note:
+            content_parts.append(f"\n{work_dir_note}")
+
         # Append Friday intel reminder if applicable
         if get_day_of_week() == self.config.get("intel_reminder_day", "friday"):
             content_parts.append(self._build_intel_reminder())
@@ -590,6 +595,59 @@ class AcademyFSM:
     # ──────────────────────────────────────────────────────────
     # Helper Methods
     # ──────────────────────────────────────────────────────────
+
+    def _build_work_dir_note(self) -> str:
+        """Build a footer telling the student where to write code."""
+        faculties = self.config.get("faculties", {})
+        output_lower = self.output.lower() if self.output else ""
+
+        # Detect faculty from sprint output
+        faculty_key = None
+        for key, fconf in faculties.items():
+            if fconf["name"].lower() in output_lower or key in output_lower:
+                faculty_key = key
+                break
+
+        if not faculty_key:
+            faculty_key = list(faculties.keys())[0] if faculties else "cpp"
+
+        # Determine week folder name suggestion
+        progress = None
+        fconf = faculties.get(faculty_key)
+        if fconf:
+            syllabus_path = resolve_path(fconf["syllabus"])
+            syllabus_text = read_file(syllabus_path)
+            if syllabus_text:
+                progress = extract_syllabus_progress(syllabus_text)
+
+        week_name = "w01"
+        if progress and progress.get("current_week"):
+            import re
+            week_match = re.search(r"Week\s+(\d+)", progress["current_week"])
+            if week_match:
+                week_num = int(week_match.group(1))
+                week_name = f"w{week_num:02d}"
+
+        # Suggest a folder name from sprint title
+        title_match = None
+        if self.output:
+            import re
+            title_match = re.search(r"##\s+Assignment:\s*(.+)", self.output)
+
+        folder_suffix = "assignment"
+        if title_match:
+            # Convert title to folder-friendly name
+            folder_suffix = title_match.group(1).strip().lower()
+            folder_suffix = re.sub(r"[^a-z0-9]+", "_", folder_suffix).strip("_")[:30]
+
+        suggested_dir = f"work/{faculty_key}/{week_name}_{folder_suffix}/"
+
+        note = "---\n\n"
+        note += "### 📁 Where to Write Your Code\n"
+        note += f"```\n{suggested_dir}\n```\n"
+        note += f"Create this folder and write your assignment files inside it.\n\n"
+        note += f"When done, run: `python orchestrator.py --check`\n"
+        return note
 
     def _is_rest_day(self) -> bool:
         """Check if today is a configured rest day."""

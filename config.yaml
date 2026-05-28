@@ -50,6 +50,7 @@ paths:
   syllabus_dir: "syllabus"
   prompts_dir: "prompts"
   logs_dir: "logs"
+  work_dir: "work"
 
 # --- Quarterly Review ---
 quarterly_review_months: [3, 6, 9, 12]  # months from start

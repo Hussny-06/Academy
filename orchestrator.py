@@ -51,6 +51,7 @@ from academy.utils import (
     load_config,
     resolve_path,
     read_file,
+    parse_frontmatter,
     extract_syllabus_progress,
     today_str,
     get_day_of_week,
@@ -164,6 +165,110 @@ def show_status(config: dict) -> None:
     print("\n" + "=" * 60 + "\n")
 
 
+def check_sprint(config: dict) -> None:
+    """Check student's work against the active sprint."""
+    state_dir = resolve_path(config["paths"]["state_dir"])
+    work_dir = resolve_path(config["paths"]["work_dir"])
+    sprint_path = state_dir / "active_sprint.md"
+
+    print("\n" + "=" * 60)
+    print("  📋 SPRINT CHECK — Validating Your Work")
+    print("=" * 60)
+
+    # Read active sprint
+    sprint_text = read_file(sprint_path)
+    if not sprint_text or is_file_empty_or_placeholder(sprint_path):
+        print("\n  ❌ No active sprint found. Run 'python orchestrator.py' first.")
+        return
+
+    # Parse sprint to detect faculty
+    sprint_lower = sprint_text.lower()
+    detected_faculty = None
+    faculty_key = None
+    for key, fconf in config.get("faculties", {}).items():
+        if fconf["name"].lower() in sprint_lower or key in sprint_lower:
+            detected_faculty = fconf["name"]
+            faculty_key = key
+            break
+
+    if not detected_faculty:
+        print("\n  ⚠️  Could not detect faculty from sprint. Check active_sprint.md.")
+        return
+
+    print(f"\n  Faculty: {detected_faculty}")
+    print(f"  Work dir: work/{faculty_key}/")
+
+    # Check for work directory
+    faculty_work = work_dir / faculty_key
+    if not faculty_work.exists():
+        print(f"\n  ❌ Directory not found: work/{faculty_key}/")
+        print(f"     Create it and add your assignment code there.")
+        return
+
+    # List subdirectories (week folders)
+    subdirs = sorted([d for d in faculty_work.iterdir() if d.is_dir() and d.name != '__pycache__'])
+    if not subdirs:
+        print(f"\n  📂 No assignment folders found in work/{faculty_key}/")
+        print(f"     Create a folder like: work/{faculty_key}/w01_cmake/")
+        print(f"     Then put your code files inside it.")
+        return
+
+    print(f"\n  📂 Assignment folders found:")
+    for sd in subdirs:
+        files = list(sd.rglob("*"))
+        code_files = [f for f in files if f.is_file() and f.suffix in (
+            '.cpp', '.h', '.hpp', '.c', '.py', '.java', '.js', '.ts',
+            '.cmake', '.txt', '.md', '.sql', '.sh', '.yaml', '.yml',
+            '.json', '.toml', '.cfg', '.ini', '.dockerfile',
+        )]
+        # Check for CMakeLists.txt specifically
+        has_cmake = any(f.name == "CMakeLists.txt" for f in files)
+        has_build_dir = any(d2.name == "build" for d2 in sd.iterdir() if d2.is_dir())
+
+        status = "✅" if code_files else "📭"
+        print(f"     {status} {sd.name}/  ({len(code_files)} code files)")
+
+        if code_files:
+            for cf in code_files[:8]:  # Show first 8 files
+                rel = cf.relative_to(sd)
+                print(f"        └─ {rel}")
+            if len(code_files) > 8:
+                print(f"        └─ ... and {len(code_files) - 8} more")
+
+        # Specific checks for C++ projects
+        if faculty_key == "cpp" and has_cmake:
+            print(f"        🔧 CMakeLists.txt detected")
+            if has_build_dir:
+                print(f"        🏗️  Build directory exists")
+            else:
+                print(f"        💡 Tip: Run 'cmake -S . -B build && cmake --build build' in {sd.name}/")
+
+    # Parse acceptance criteria from sprint
+    criteria = []
+    for line in sprint_text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- [ ]") or stripped.startswith("- [x]"):
+            criteria.append(stripped)
+
+    if criteria:
+        print(f"\n  📝 Acceptance Criteria:")
+        for c in criteria:
+            print(f"     {c}")
+        print(f"\n  ℹ️  Mark criteria as [x] in your journal when complete.")
+
+    # Summary
+    latest = subdirs[-1] if subdirs else None
+    if latest:
+        latest_files = list(latest.rglob("*"))
+        latest_code = [f for f in latest_files if f.is_file() and not f.name.startswith('.')]
+        if latest_code:
+            print(f"\n  ✅ Work detected in {latest.name}/. Log your progress in your journal!")
+        else:
+            print(f"\n  📭 {latest.name}/ is empty. Start writing code!")
+
+    print("\n" + "=" * 60 + "\n")
+
+
 def add_sr_item(config: dict, concept: str, faculty: str) -> None:
     """Manually add a concept to the spaced repetition queue."""
     state_dir = resolve_path(config["paths"]["state_dir"])
@@ -217,6 +322,11 @@ def main():
         action="store_true",
         help="Pre-load model into VRAM (avoids cold-start delay)",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Validate your work against the active sprint",
+    )
 
     args = parser.parse_args()
 
@@ -236,6 +346,11 @@ def main():
             print("Valid faculties: cpp, dsa, ai, scale, interview")
             sys.exit(1)
         add_sr_item(config, args.add_sr, args.faculty)
+        return
+
+    # Handle sprint check
+    if args.check:
+        check_sprint(config)
         return
 
     # Handle model warmup
