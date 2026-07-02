@@ -2,7 +2,7 @@
 
 > **Purpose:** Attach this file when starting a new Antigravity conversation about Project Academy. It gives full context so I can pick up exactly where we left off without hallucinating or asking redundant questions.
 >
-> **Last updated:** 2026-07-01
+> **Last updated:** 2026-07-02
 
 ---
 
@@ -20,7 +20,30 @@
 
 ---
 
-## 2. Hardware & Environment
+## 2. Current Student Progress
+
+> ⚠️ **UPDATE THIS SECTION** whenever progress changes significantly.
+
+| Faculty | Current Week | Status |
+|---|---|---|
+| C++ / Systems | Week 1 — CMake | 🟡 In progress (w01_cmake started, CMakeLists.txt + main.cpp written, utils.cpp empty) |
+| DSA | Not started | 🔴 |
+| Edge AI / ML | Not started | 🔴 |
+| Data & Scale | Not started | 🔴 |
+| Interview Prep | Not started | 🔴 |
+
+**Active assignment:** CMake Targets and Libraries — create executable + static library + link them.
+
+**Student notes:**
+- First time encountering CMake/build systems — needs conceptual guidance, not just task lists
+- Using `<stdio.h>` (C-style) in main.cpp — should be guided toward `<iostream>` (C++)
+- Has watched The Cherno compiler/linker videos (verified links working)
+
+**Blockers:** None currently. Ollama + 7B model operational.
+
+---
+
+## 3. Hardware & Environment
 
 | Component | Detail |
 |---|---|
@@ -30,13 +53,12 @@
 | **LLM** | `qwen2.5-coder:7b` via Ollama (4.7 GB, fits in VRAM) |
 | **Python** | 3.11.9 |
 | **Project Path** | `D:\Dev\Projects\AI Academy` |
-| **Workspace** | `d:\Dev\Projects\Biomechanics_MiniProject_SemVI` (for running commands) |
 
 > **Why 7B not 14B:** The 14B model (9 GB) requires ~10 GB total memory. With 16 GB RAM at ~50% usage, there's not enough headroom for CPU memory spill. The 7B fits entirely in 6 GB VRAM — no spill, no crashes, 4x faster (12-14 tok/s vs 2.7 tok/s).
 
 ---
 
-## 3. Project Architecture
+## 4. Project Architecture
 
 ```
 AI Academy/
@@ -44,21 +66,22 @@ AI Academy/
 ├── config.yaml              # Model, faculties, weights, paths, target companies
 ├── test_e2e.py              # End-to-end integration test
 ├── requirements.txt         # pyyaml, httpx
+├── ACADEMY_CONTEXT.md       # This file — attach to new Antigravity chats
 │
 ├── academy/                 # Core engine
 │   ├── fsm.py               # Finite State Machine (the brain)
 │   ├── ollama.py            # Ollama HTTP client (generate, warmup, CUDA check)
 │   ├── sm2.py               # Spaced repetition engine (SM-2 algorithm)
-│   ├── utils.py             # File I/O, markdown parsing, syllabus progress
+│   ├── utils.py             # File I/O, markdown parsing, syllabus progress, resource extraction
 │   └── report.py            # Weekly report generation
 │
 ├── prompts/                 # LLM prompt templates
-│   ├── system_prompt.md     # Academy persona + output format
+│   ├── system_prompt.md     # Academy persona + output format (no URLs allowed)
 │   ├── sprint_gen.md        # Sprint generation context injection
 │   └── intel_analysis.md    # Job posting analysis prompt
 │
 ├── syllabus/                # 52-week curricula (one per faculty)
-│   ├── syllabus_cpp.md      # C++ / Systems (35% weight)
+│   ├── syllabus_cpp.md      # C++ / Systems (35% weight) — Weeks 1-6 have verified resources
 │   ├── syllabus_dsa.md      # DSA (25% weight)
 │   ├── syllabus_ai.md       # Edge AI / ML (15% weight)
 │   ├── syllabus_scale.md    # Data & Scale (12% weight)
@@ -75,7 +98,7 @@ AI Academy/
 │   └── weekly_report.md     # Weekly metrics
 │
 ├── work/                    # Student's assignment code
-│   ├── cpp/                 # C++ assignments (w01_cmake/, w02_memory/, etc.)
+│   ├── cpp/                 # C++ assignments (w01_cmake/ ← currently active)
 │   ├── dsa/                 # DSA solutions
 │   ├── ai/                  # ML work
 │   ├── scale/               # System design work
@@ -91,7 +114,7 @@ AI Academy/
 
 ---
 
-## 4. FSM States (the Core Loop)
+## 5. FSM States (the Core Loop)
 
 ```
 IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GENERATE_SPRINT → WRITE_OUTPUT → ARCHIVE → IDLE
@@ -108,7 +131,7 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 
 ---
 
-## 5. Key Design Decisions (and WHY)
+## 6. Key Design Decisions (and WHY)
 
 | Decision | Why |
 |---|---|
@@ -116,7 +139,7 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 | **Resources injected by code, not LLM** | The 7B model hallucinated fake URLs (2/3 links were dead). FSM now strips LLM resource sections and injects verified links from syllabus. |
 | **Sprint includes "What You Need to Know"** | Student encountered topics they'd never seen (e.g., CMake). Original prompt assumed prior knowledge. |
 | **Sprint includes "Where to Write Code"** | Student didn't know where to put assignment code. FSM now appends `work/{faculty}/{week}_{topic}/` guidance. |
-| **Weekly reviews done by Antigravity, not 7B** | 7B can follow templates but can't reason about code quality, learning patterns, or strategy. |
+| **Weekly reviews done by Antigravity, not 7B** | 7B can follow templates but can't reason about code quality, learning patterns, or strategy. `--mode=review` exists but is not used. |
 | **Sunday rest day** | Configured in config.yaml. No sprint generated on Sundays. |
 | **300s timeout** | Cold-loading the model can take 30-60s on first run. 300s gives ample headroom. |
 | **CUDA conflict detection** | If student has `ollama run` open interactively, it hogs VRAM. FSM warns before attempting generation. |
@@ -124,7 +147,7 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 
 ---
 
-## 6. CLI Commands
+## 7. CLI Commands
 
 | Command | LLM Call? | Purpose |
 |---|---|---|
@@ -134,11 +157,10 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 | `python orchestrator.py --warmup` | ✅ Minimal | Pre-load model into VRAM |
 | `python orchestrator.py --add-sr "X" --faculty Y` | ❌ No | Add concept to spaced repetition |
 | `python orchestrator.py -v` | ✅ Yes | Verbose debug mode |
-| `python orchestrator.py --mode=review` | ✅ Yes | Auto metrics (rarely used — Antigravity does reviews) |
 
 ---
 
-## 7. Faculties & Target Companies
+## 8. Faculties & Target Companies
 
 **5 Faculties:**
 - **C++ / Systems** (35%) — Build systems, memory, RAII, move semantics, threading, lock-free, kernel bypass
@@ -153,7 +175,7 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 
 ---
 
-## 8. Known Issues & Workarounds
+## 9. Known Issues & Workarounds
 
 | Issue | Workaround |
 |---|---|
@@ -166,7 +188,7 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 
 ---
 
-## 9. What Antigravity (I) Do for This Project
+## 10. What Antigravity (I) Do for This Project
 
 1. **Weekly reviews** — Read journals, review code, analyze progress, adjust strategy
 2. **Code review** — Deep feedback on assignment code in `work/` directory
@@ -177,11 +199,26 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 
 ---
 
-## 10. How to Use This File
+## 11. Development History (Key Milestones)
+
+| Date | Milestone |
+|---|---|
+| 2026-05 | Initial Academy built — FSM, Ollama client, SM-2, 5 syllabi |
+| 2026-05-24 | Switched from 14B → 7B model (hardware constraint) |
+| 2026-05-26 | First manual run — failed (Ollama not running), then 14B OOM'd |
+| 2026-05-27 | Rewrote system prompt for learning-first pedagogy |
+| 2026-05-27 | Added resource injection system (strip LLM URLs, inject from syllabus) |
+| 2026-05-28 | Added `work/` directory structure and `--check` command |
+| 2026-07-01 | Created ACADEMY_CONTEXT.md and ME.md |
+| 2026-07-02 | Student started first assignment (w01_cmake) |
+
+---
+
+## 12. How to Use This File
 
 **Starting a new chat:**
 > "I'm working on Project Academy. Here's the context file: [attach ACADEMY_CONTEXT.md]. I need help with [specific request]."
 
 **Updating this file:** After significant changes (new features, architecture shifts, resolved issues), ask Antigravity to update this file.
 
-**What NOT to put here:** Daily progress, journal entries, specific sprint content — those belong in `archive/` and `state/`. This file is about the *system*, not the *content*.
+**What NOT to put here:** Daily progress, journal entries, specific sprint content — those belong in `archive/` and `state/`. This file is about the *system*, not the *content*. Exception: Section 2 (Current Progress) should be kept up-to-date.
