@@ -432,6 +432,15 @@ class AcademyFSM:
 
     def _state_write_output(self) -> str:
         """Write the generated sprint to active_sprint.md."""
+        # Archive the previous sprint before overwriting
+        if not is_file_empty_or_placeholder(self.sprint_path):
+            archive_file(
+                self.sprint_path,
+                self.archive_dir / "sprints",
+                prefix="sprint_",
+            )
+            logger.info("Previous sprint archived.")
+
         # Strip any LLM-hallucinated resource sections from output
         cleaned_output = self._strip_llm_resources(self.output)
 
@@ -490,11 +499,6 @@ class AcademyFSM:
             )
             write_file(self.journal_path, template)
             logger.info("Journal archived and reset.")
-
-        # Also archive the previous sprint
-        if not is_file_empty_or_placeholder(self.sprint_path):
-            # The sprint was just written, so we archive it as a backup
-            pass  # Current sprint stays active; it gets archived next cycle
 
         return "IDLE"
 
