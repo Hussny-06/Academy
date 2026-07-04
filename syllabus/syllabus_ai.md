@@ -7,7 +7,8 @@
 > - PyTorch Documentation (torch.onnx)
 > - *Deep Learning* — Ian Goodfellow (foundations reference)
 >
-> **Hardware:** RTX 3050 (6GB VRAM) — all work must be feasible on this GPU
+> **Hardware:** RTX 3050 (6GB VRAM) — all work must be feasible on this GPU and also there are
+ other onile platforms like kaggle that can be used when work preceeds the capability of these GPU
 > **Weekly Cadence:** 2h theory + 4h hands-on + 1h reading/research
 
 ---

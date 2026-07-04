@@ -15,8 +15,8 @@
 ## Phase 1: Foundation (Weeks 1–13)
 
 ### Week 1 — C++ Build Systems & Environment
-- [ ] CMake fundamentals: targets, libraries, compiler flags
-- [ ] GCC/Clang compilation pipeline: preprocessor → compiler → assembler → linker
+- [x] CMake fundamentals: targets, libraries, compiler flags
+- [x] GCC/Clang compilation pipeline: preprocessor → compiler → assembler → linker
 - [ ] Debug vs Release builds, `-O2` vs `-O3` vs `-Os`
 - [ ] Setting up Google Benchmark & Google Test
 - **Deliverable:** CMake project template with benchmark + test targets
