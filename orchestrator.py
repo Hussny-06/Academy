@@ -66,16 +66,74 @@ def setup_logging(logs_dir: Path, verbose: bool = False) -> None:
 
     log_level = logging.DEBUG if verbose else logging.INFO
 
-    # Console handler
+    # Custom pretty formatter for console
+    class PrettyConsoleFormatter(logging.Formatter):
+        """Formats log messages with icons and clean layout for terminal."""
+
+        ICONS = {
+            "Transition:": "  →",
+            "=== Academy FSM Start": "\n  🚀",
+            "=== Academy FSM Complete": "  ✅",
+            "Journal parsed:": "  📓",
+            "Processing intel": "  🔍",
+            "Intel analysis complete": "  🔍",
+            "Calling Ollama:": "  🤖",
+            "Ollama response:": "  ⚡",
+            "Sprint generated:": "  📝",
+            "Sprint written": "  💾",
+            "Previous sprint archived": "  📦",
+            "Injected verified resources": "  📚",
+            "No curated resources": "  📚",
+            "Position assessed:": "  📊",
+            "SR check:": "  🔁",
+            "Archived": "  📦",
+            "Journal archived": "  📦",
+            "Wrote": "  💾",
+            "Loaded": "  📂",
+            "FSM Error:": "  ❌",
+        }
+
+        SKIP_PATTERNS = [
+            "Wrote ",          # File write details (noisy)
+        ]
+
+        def format(self, record):
+            msg = record.getMessage()
+
+            # In non-verbose mode, skip noisy messages
+            if record.levelno <= logging.INFO:
+                for pattern in self.SKIP_PATTERNS:
+                    if msg.startswith(pattern):
+                        return ""
+
+            # Find matching icon
+            icon = "  ℹ️ "
+            for key, value in self.ICONS.items():
+                if key in msg:
+                    icon = value
+                    break
+
+            # Error level gets special treatment
+            if record.levelno >= logging.ERROR:
+                icon = "  ❌"
+
+            # Clean up the message
+            msg = msg.replace("=== ", "").replace(" ===", "")
+
+            return f"{icon} {msg}"
+
+    # Console handler — pretty output
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(log_level)
-    console_fmt = logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%H:%M:%S",
-    )
-    console_handler.setFormatter(console_fmt)
+    console_handler.setFormatter(PrettyConsoleFormatter())
+    # Filter out empty formatted messages
+    class NonEmptyFilter(logging.Filter):
+        def filter(self, record):
+            formatter = console_handler.formatter
+            return bool(formatter.format(record).strip())
+    console_handler.addFilter(NonEmptyFilter())
 
-    # File handler
+    # File handler — detailed output (unchanged)
     file_handler = logging.FileHandler(
         logs_dir / "orchestrator.log", encoding="utf-8"
     )
