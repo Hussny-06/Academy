@@ -2,21 +2,24 @@
 
 > **Purpose:** Attach this file when starting a new Antigravity conversation about Project Academy. It gives full context so I can pick up exactly where we left off without hallucinating or asking redundant questions.
 >
-> **Last updated:** 2026-07-02
+> **Last updated:** 2026-07-11
 
 ---
 
 ## 1. What Is This Project?
 
-**Project Academy** is a self-study orchestration engine that generates daily coding assignments for a 6th-semester Computer Engineering student (Hussain) preparing for placement at HFT firms and top tech companies. Graduation deadline: June 2027.
+**Project Academy** is a self-study orchestration system for a 6th-semester Computer Engineering student (Hussain) preparing for placement at HFT firms and top tech companies. Graduation deadline: June 2027.
 
-**How it works:**
-1. Student writes a journal entry about yesterday's progress
-2. `python orchestrator.py` runs an FSM that reads the journal, checks syllabus position, calls a local LLM (Ollama), and generates today's assignment
-3. Student reads the sprint, studies resources, writes code in `work/` directory
-4. Weekly deep review happens with Antigravity (me), not the local LLM
+**How it works (current workflow — v2, since July 11 2026):**
+1. Student opens an Antigravity chat, attaches this file
+2. Antigravity reads syllabus, journal, SR queue → generates today's sprint
+3. Student studies, writes code in `work/` directory
+4. Student comes back → Antigravity validates work, reads journal
+5. Student updates syllabus checkboxes themselves
 
-**The split:** 7B local model handles daily sprint generation (structured, template-following). Antigravity handles weekly reviews, code review, strategy, and anything requiring real reasoning.
+> **IMPORTANT: The local 7B LLM (Ollama) is NO LONGER used for sprint generation.** It was retired on 2026-07-11 because it hallucinated problems, missed syllabus items, and repeated topics. Antigravity now handles ALL sprint generation, code review, and validation directly.
+>
+> The orchestrator CLI still works for `--check` (validate code structure) and `--status` (system health), but `python orchestrator.py` (sprint gen) is deprecated.
 
 ---
 
@@ -26,20 +29,20 @@
 
 | Faculty | Current Week | Status |
 |---|---|---|
-| C++ / Systems | Week 1 — CMake | 🟡 In progress (w01_cmake started, CMakeLists.txt + main.cpp written, utils.cpp empty) |
-| DSA | Not started | 🔴 |
+| C++ / Systems | Week 1 — CMake | 🟡 Items 1-2 done (targets, linking, compiler pipeline). Items 3-4 pending (Debug/Release, Google Test) |
+| DSA | Week 1 — Complexity & Arrays | 🟡 Sprint generated, not yet started |
 | Edge AI / ML | Not started | 🔴 |
 | Data & Scale | Not started | 🔴 |
 | Interview Prep | Not started | 🔴 |
 
-**Active assignment:** CMake Targets and Libraries — create executable + static library + link them.
-
 **Student notes:**
-- First time encountering CMake/build systems — needs conceptual guidance, not just task lists
-- Using `<stdio.h>` (C-style) in main.cpp — should be guided toward `<iostream>` (C++)
-- Has watched The Cherno compiler/linker videos (verified links working)
+- Learns best with conceptual explanations first, then hands-on coding
+- Has MSYS2/MinGW toolchain set up (g++ 15.2.0, CMake via pacman)
+- Uses `-G "MinGW Makefiles"` for CMake builds on Windows
+- Has Codeforces account (need to start solving)
+- Watched Cherno compiler/linker videos
 
-**Blockers:** None currently. Ollama + 7B model operational.
+**Blockers:** None.
 
 ---
 
@@ -147,16 +150,15 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 
 ---
 
-## 7. CLI Commands
+## 7. CLI Commands (Still Functional)
 
-| Command | LLM Call? | Purpose |
+| Command | Status | Purpose |
 |---|---|---|
-| `python orchestrator.py` | ✅ Yes | Generate daily sprint |
-| `python orchestrator.py --status` | ❌ No | System health dashboard |
-| `python orchestrator.py --check` | ❌ No | Validate student's code against sprint |
-| `python orchestrator.py --warmup` | ✅ Minimal | Pre-load model into VRAM |
-| `python orchestrator.py --add-sr "X" --faculty Y` | ❌ No | Add concept to spaced repetition |
-| `python orchestrator.py -v` | ✅ Yes | Verbose debug mode |
+| `python orchestrator.py --status` | ✅ Active | System health dashboard |
+| `python orchestrator.py --check` | ✅ Active | Validate student's code against sprint |
+| `python orchestrator.py --add-sr "X" --faculty Y` | ✅ Active | Add concept to spaced repetition |
+| `python orchestrator.py` | ⚠️ Deprecated | Sprint gen via 7B — replaced by Antigravity |
+| `python orchestrator.py --warmup` | ⚠️ Deprecated | No longer needed without daily LLM calls |
 
 ---
 
