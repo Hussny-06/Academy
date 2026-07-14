@@ -1,0 +1,6 @@
+D:/Dev/Projects/AI Academy/work/cpp/w01_cmake/build-release/CMakeFiles/utils_lib.dir
+D:/Dev/Projects/AI Academy/work/cpp/w01_cmake/build-release/CMakeFiles/my_project.dir
+D:/Dev/Projects/AI Academy/work/cpp/w01_cmake/build-release/CMakeFiles/run_tests.dir
+D:/Dev/Projects/AI Academy/work/cpp/w01_cmake/build-release/CMakeFiles/test.dir
+D:/Dev/Projects/AI Academy/work/cpp/w01_cmake/build-release/CMakeFiles/edit_cache.dir
+D:/Dev/Projects/AI Academy/work/cpp/w01_cmake/build-release/CMakeFiles/rebuild_cache.dir

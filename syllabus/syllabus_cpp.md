@@ -17,8 +17,8 @@
 ### Week 1 — C++ Build Systems & Environment
 - [x] CMake fundamentals: targets, libraries, compiler flags
 - [x] GCC/Clang compilation pipeline: preprocessor → compiler → assembler → linker
-- [ ] Debug vs Release builds, `-O2` vs `-O3` vs `-Os`
-- [ ] Setting up Google Benchmark & Google Test
+- [x] Debug vs Release builds, `-O2` vs `-O3` vs `-Os`
+- [x] Setting up Google Benchmark & Google Test
 - **Deliverable:** CMake project template with benchmark + test targets
 - **Resources:**
   - 🎥 [How the C++ Compiler Works — The Cherno (17 min)](https://www.youtube.com/watch?v=3tIqpEmWMLI)
