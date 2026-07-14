@@ -16,6 +16,9 @@ __pycache__/
 .eggs/
 dist/
 build/
+build-*/
+*.exe
+*.a
 *.egg
 .venv/
 venv/
@@ -35,3 +38,4 @@ desktop.ini
 
 #Personal ScratchBook
 ME.md
+$.md
