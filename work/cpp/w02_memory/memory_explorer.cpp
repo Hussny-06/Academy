@@ -13,6 +13,7 @@ int main(){
     cout<<"Address of global "<<&global<<endl;
     cout<<"Address of Stackvar "<<&Stackvar<<endl;
     cout<<"Address of heapvar "<<heapvar<<endl;
+    delete heapvar;
 
     // showing the padding and alignment
     struct BadLayout{

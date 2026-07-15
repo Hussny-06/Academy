@@ -28,10 +28,10 @@
   - ⏱️ Study time: ~1 hour (watch both Cherno videos + read CMake Step 1)
 
 ### Week 2 — Memory Model: Stack, Heap, Static
-- [ ] Stack frame layout, calling conventions (cdecl, System V AMD64)
-- [ ] Heap allocation internals: `malloc`/`free`, `brk`/`mmap`
-- [ ] Static vs dynamic storage duration
-- [ ] `sizeof`, alignment, padding rules (`alignof`, `alignas`)
+- [x] Stack frame layout, calling conventions (cdecl, System V AMD64)
+- [x] Heap allocation internals: `malloc`/`free`, `brk`/`mmap`
+- [x] Static vs dynamic storage duration
+- [x] `sizeof`, alignment, padding rules (`alignof`, `alignas`)
 - **Deliverable:** Program that visualizes memory layout of structs with different padding
 - **Resources:**
   - 🎥 [Stack vs Heap Memory — The Cherno](https://www.youtube.com/watch?v=wJ1L2nSIV1s)
