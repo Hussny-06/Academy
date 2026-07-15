@@ -15,9 +15,9 @@
 ## Phase 1: Foundation (Weeks 1–13)
 
 ### Week 1 — Complexity Analysis & Arrays
-- [ ] Big-O, Big-Ω, Big-Θ — formal definitions with proofs
-- [ ] Amortized analysis (aggregate, accounting, potential methods)
-- [ ] Array problems: Two Sum, Kadane's algorithm, Dutch National Flag
+- [x] Big-O, Big-Ω, Big-Θ — formal definitions with proofs
+- [x] Amortized analysis (aggregate, accounting, potential methods)
+- [x] Array problems: Two Sum, Kadane's algorithm, Dutch National Flag
 - **Problems:** 10 Easy (arrays), 5 Medium (arrays)
 - **LC Focus:** #1, #53, #75, #238, #41
 
