@@ -29,8 +29,8 @@
 
 | Faculty | Current Week | Status |
 |---|---|---|
-| C++ / Systems | Week 1 — CMake | 🟡 Items 1-2 done (targets, linking, compiler pipeline). Items 3-4 pending (Debug/Release, Google Test) |
-| DSA | Week 1 — Complexity & Arrays | 🟡 Sprint generated, not yet started |
+| C++ / Systems | Week 2 — Memory Model | 🟢 W1 & W2 complete. Implemented memory explorer, analyzed struct alignment/padding. |
+| DSA | Week 1 — Complexity & Arrays | 🟡 W1 Focus complete (5 LC problems). 10 Easy + 5 Medium volume problems pending as side practice. |
 | Edge AI / ML | Not started | 🔴 |
 | Data & Scale | Not started | 🔴 |
 | Interview Prep | Not started | 🔴 |
