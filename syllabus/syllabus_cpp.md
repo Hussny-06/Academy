@@ -46,8 +46,8 @@
 - [ ] `std::shared_ptr` + `std::weak_ptr` — reference counting internals
 - **Deliverable:** Custom `UniquePtr<T>` with deleter support, full test suite
 - **Resources:**
-  - 🎥 [RAII in C++ — The Cherno](https://www.youtube.com/watch?v=AmjoMSEXfmI)
-  - 🎥 [Smart Pointers — The Cherno](https://www.youtube.com/watch?v=UOB7-B2MfwA)
+  - 🎥 [SMART POINTERS in C++ — The Cherno (20 min)](https://www.youtube.com/watch?v=UOB7-B2MfwA)
+  - 🎥 [Object Lifetime in C++ — The Cherno](https://www.youtube.com/results?search_query=The+Cherno+Object+Lifetime+in+C%2B%2B)
   - 📖 *Effective Modern C++* — Items 18-22 (Smart Pointers)
   - 📄 [cppreference: std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
 
