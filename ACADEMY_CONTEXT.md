@@ -30,7 +30,7 @@
 | Faculty | Current Week | Status |
 |---|---|---|
 | C++ / Systems | Week 2 — Memory Model | 🟢 W1 & W2 complete. Implemented memory explorer, analyzed struct alignment/padding. |
-| DSA | Week 1 — Complexity & Arrays | 🟡 W1 Focus complete (5 LC problems). 10 Easy + 5 Medium volume problems pending as side practice. |
+| DSA | Week 2 — Strings & Hashing | 🟢 W1 & W2 complete. Solved LC #242, #49, #3, #438, #76. Mastered frequency arrays & sliding window. |
 | Edge AI / ML | Not started | 🔴 |
 | Data & Scale | Not started | 🔴 |
 | Interview Prep | Not started | 🔴 |

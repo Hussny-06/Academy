@@ -22,9 +22,9 @@
 - **LC Focus:** #1, #53, #75, #238, #41
 
 ### Week 2 — Strings & Hashing
-- [ ] String manipulation, substring problems
-- [ ] Hash maps, frequency counting, anagram grouping
-- [ ] Rolling hash (Rabin-Karp) introduction
+- [x] String manipulation, substring problems
+- [x] Hash maps, frequency counting, anagram grouping
+- [x] Rolling hash (Rabin-Karp) introduction
 - **Problems:** 8 Easy, 7 Medium
 - **LC Focus:** #49, #3, #76, #242, #438
 
