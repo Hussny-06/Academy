@@ -19,7 +19,7 @@ from academy.utils import (
 logger = logging.getLogger("academy")
 
 # Table column headers (must match the markdown file)
-SR_HEADERS = ["Concept", "Faculty", "Last Review", "Interval (days)", "EF", "Next Due"]
+SR_HEADERS = ["Concept", "Faculty", "Sprint", "Last Review", "Interval (days)", "EF", "Next Due"]
 
 
 class SR_Item:
@@ -29,6 +29,7 @@ class SR_Item:
         self,
         concept: str,
         faculty: str,
+        sprint: str,
         last_review: str,
         interval: int,
         ef: float,
@@ -36,6 +37,7 @@ class SR_Item:
     ):
         self.concept = concept
         self.faculty = faculty
+        self.sprint = sprint
         self.last_review = last_review
         self.interval = interval
         self.ef = ef
@@ -45,6 +47,7 @@ class SR_Item:
         return {
             "Concept": self.concept,
             "Faculty": self.faculty,
+            "Sprint": self.sprint,
             "Last Review": self.last_review,
             "Interval (days)": str(self.interval),
             "EF": f"{self.ef:.2f}",
@@ -56,6 +59,7 @@ class SR_Item:
         return cls(
             concept=row.get("Concept", ""),
             faculty=row.get("Faculty", ""),
+            sprint=row.get("Sprint", ""),
             last_review=row.get("Last Review", today_str()),
             interval=int(row.get("Interval (days)", "1")),
             ef=float(row.get("EF", "2.5")),
@@ -107,7 +111,7 @@ class SpacedRepetitionEngine:
                 due.append(item)
         return due
 
-    def add_item(self, concept: str, faculty: str) -> None:
+    def add_item(self, concept: str, faculty: str, sprint: str = "") -> None:
         """Add a new concept to the SR queue."""
         # Check for duplicates
         for item in self.items:
@@ -118,6 +122,7 @@ class SpacedRepetitionEngine:
         new_item = SR_Item(
             concept=concept,
             faculty=faculty,
+            sprint=sprint,
             last_review=today_str(),
             interval=self.initial_interval,
             ef=self.initial_ef,
@@ -125,7 +130,7 @@ class SpacedRepetitionEngine:
         )
         self.items.append(new_item)
         self._save()
-        logger.info(f"Added SR item: {concept} ({faculty})")
+        logger.info(f"Added SR item: {concept} ({faculty}, sprint={sprint})")
 
     def review_item(self, concept: str, grade: int) -> None:
         """

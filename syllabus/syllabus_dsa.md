@@ -314,3 +314,117 @@
 - [ ] Speed run: solve 5 Medium problems in 60 min
 - [ ] Confidence check: solve 2 Hard problems cold
 - **Target:** 400+ problems completed, contest rating 1600+ (Codeforces)
+
+---
+
+## 🏆 Competitive Programming — Parallel Track
+
+> **Purpose:** Build contest speed, learn CP-specific techniques not covered by LeetCode, and track Codeforces rating progression. This runs **alongside** the main DSA phases — not as a separate weekly block.
+>
+> **Platform:** Codeforces (primary), LeetCode Weekly/Biweekly Contests (secondary)
+>
+> **Weekly Cadence:** 1 live contest + 2h upsolving per week (drawn from the DSA 12h budget)
+>
+> **Target Rating:** Newbie → Pupil (1200+) by Week 13 → Specialist (1400+) by Week 26 → Expert (1600+) by Week 52
+
+---
+
+### CP Phase 1: Contest Onboarding (Weeks 3–13, parallel to DSA Phase 1)
+
+**Goal:** Get comfortable with Codeforces format, fast I/O, and Div 3/4 problems.
+
+- [ ] Set up Codeforces C++ template (fast I/O, typedefs, macros)
+- [ ] Participate in **1 Codeforces Div 3 or Div 4** contest per week
+- [ ] Upsolve **all unsolved problems** from each contest within 48 hours
+- [ ] Solve **20 problems** from Codeforces Problemset rated 800-1000
+- [ ] Solve **10 problems** from Codeforces Problemset rated 1000-1200
+
+**CP-Specific Topics to Learn:**
+- [ ] Codeforces fast I/O boilerplate (`ios::sync_with_stdio(false); cin.tie(0);`)
+- [ ] Constructive algorithms (building solutions that satisfy constraints)
+- [ ] Greedy + sorting as a first instinct (most Div 3 A-C problems)
+- [ ] Implementation problems (careful simulation, edge case handling)
+- [ ] Basic number theory for CP: parity, divisibility, modular arithmetic
+
+**Resources:**
+- 📄 [Codeforces Problemset — Sort by Rating](https://codeforces.com/problemset?order=BY_RATING_ASC)
+- 📄 [USACO Guide — Getting Started](https://usaco.guide/general/intro-cp)
+- 📖 *Competitive Programmer's Handbook* — Chapters 1-5
+
+**Deliverable:** Codeforces C++ template committed to `work/dsa/cp_template/`
+
+---
+
+### CP Phase 2: Rating Push (Weeks 14–26, parallel to DSA Phase 2)
+
+**Goal:** Consistently solve A-C in Div 2 contests. Push rating above 1400.
+
+- [ ] Participate in **1 Codeforces Div 2** contest per week
+- [ ] Solve **30 problems** from Codeforces Problemset rated 1200-1400
+- [ ] Solve **15 problems** from Codeforces Problemset rated 1400-1600
+- [ ] Upsolve D problems from Div 2 contests (even if not solved live)
+- [ ] Participate in **2 LeetCode Weekly Contests** per month
+
+**CP-Specific Topics to Learn:**
+- [ ] Prefix sums & difference arrays (1D and 2D)
+- [ ] Binary search on answer (monotonic search space problems)
+- [ ] Two-pointer under time pressure (contest speed)
+- [ ] Basic graph traversal in contest setting (BFS/DFS with time constraints)
+- [ ] Combinatorics under modular arithmetic (`nCr mod p`, Fermat's little theorem)
+- [ ] Coordinate compression
+- [ ] Offline query processing (sorting queries)
+
+**Resources:**
+- 📄 [cp-algorithms.com](https://cp-algorithms.com/) — Reference for all CP algorithms
+- 📄 [A2OJ Ladders](https://a2oj.netlify.app/) — Problem ladders by rating
+
+---
+
+### CP Phase 3: Specialization (Weeks 27–39, parallel to DSA Phase 3)
+
+**Goal:** Crack Div 2 D/E problems. Build fluency in segment trees and advanced DP under contest pressure.
+
+- [ ] Participate in **1 Codeforces Div 2** contest per week (target: solve A-D)
+- [ ] Solve **20 problems** from Codeforces Problemset rated 1600-1800
+- [ ] Solve **10 problems** from Codeforces Problemset rated 1800-2000
+- [ ] Attempt **3 Codeforces Div 1** contests (upsolve all)
+- [ ] Virtual participate in **5 past Div 2 contests** (simulate real conditions)
+
+**CP-Specific Topics to Learn:**
+- [ ] Segment tree with lazy propagation under contest pressure
+- [ ] DSU (Disjoint Set Union) advanced: weighted DSU, rollback
+- [ ] Sparse tables for RMQ (Range Minimum Query)
+- [ ] Heavy-light decomposition (concept)
+- [ ] Euler tour technique for tree queries
+- [ ] Meet in the middle
+- [ ] SOS DP (Sum over Subsets)
+
+---
+
+### CP Phase 4: Peak Performance (Weeks 40–52, parallel to DSA Phase 4)
+
+**Goal:** Maintain contest consistency, target Expert rating (1600+).
+
+- [ ] Participate in **every available Codeforces round** (Div 2 minimum)
+- [ ] Virtual contest practice: **2 past rounds per week** (timed)
+- [ ] Solve **10 problems** rated 2000+ (stretch goal)
+- [ ] Maintain an upsolving log in `work/dsa/cp_upsolve_log.md`
+- [ ] Analyze contest performance: time per problem, penalty distribution
+
+---
+
+### 📊 CP Rating Tracker
+
+| Date | Contest | Solved | Rating Before | Rating After | Delta |
+|---|---|---|---|---|---|
+| — | — | — | Unrated | — | — |
+
+> Update this table after each rated contest.
+
+### 📁 CP Work Directory Structure
+```
+work/dsa/cp_template/         # Codeforces C++ template
+work/dsa/cp_contests/         # Contest solutions organized by contest ID
+work/dsa/cp_upsolve_log.md    # Upsolving tracker
+```
+
