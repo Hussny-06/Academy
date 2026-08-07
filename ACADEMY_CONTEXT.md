@@ -85,7 +85,7 @@ AI Academy/
 │
 ├── syllabus/                # 52-week curricula (one per faculty)
 │   ├── syllabus_cpp.md      # C++ / Systems (35% weight) — Weeks 1-6 have verified resources
-│   ├── syllabus_dsa.md      # DSA (25% weight)
+│   ├── syllabus_dsa.md      # DSA (25% weight) + Competitive Programming parallel track
 │   ├── syllabus_ai.md       # Edge AI / ML (15% weight)
 │   ├── syllabus_scale.md    # Data & Scale (12% weight)
 │   └── syllabus_interview.md # Interview Prep (13% weight)
@@ -96,13 +96,18 @@ AI Academy/
 │   ├── intel_drop.md        # Job postings pasted on Fridays
 │   ├── intel_analysis.md    # LLM analysis of job postings
 │   ├── competency_matrix.md # Skill tracking (🔴→🟡→🟢)
-│   ├── spaced_repetition.md # SM-2 review queue
+│   ├── spaced_repetition.md # SM-2 review queue (includes Sprint column for traceability)
 │   ├── project_tracker.md   # Portfolio project progress
 │   └── weekly_report.md     # Weekly metrics
 │
 ├── work/                    # Student's assignment code
-│   ├── cpp/                 # C++ assignments (w01_cmake/ ← currently active)
-│   ├── dsa/                 # DSA solutions
+│   ├── cpp/                 # C++ assignments (w01_cmake, w02_memory)
+│   ├── dsa/                 # DSA solutions + CP contest work
+│   │   ├── w01_complexity_arrays/
+│   │   ├── w02_strings_hashing/
+│   │   ├── cp_template/     # Codeforces C++ template
+│   │   ├── cp_contests/     # Contest solutions by contest ID
+│   │   └── cp_upsolve_log.md
 │   ├── ai/                  # ML work
 │   ├── scale/               # System design work
 │   └── interview/           # Interview prep materials
@@ -166,7 +171,7 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 
 **5 Faculties:**
 - **C++ / Systems** (35%) — Build systems, memory, RAII, move semantics, threading, lock-free, kernel bypass
-- **DSA** (25%) — 400+ LeetCode problems, segment trees, DP, graphs, competitive programming
+- **DSA** (25%) — 400+ LeetCode problems, segment trees, DP, graphs + **Competitive Programming parallel track** (Codeforces Div 3→2→1, target Expert 1600+ rating by Week 52)
 - **Edge AI / ML** (15%) — PyTorch → ONNX → TensorRT → CUDA → C++ inference server
 - **Data & Scale** (12%) — SQL, Docker, Redis, system design, Raft KV store project
 - **Interview Prep** (13%) — Resume, behavioral, mocks, company research, negotiation
@@ -213,6 +218,10 @@ IDLE → READ_JOURNAL → PROCESS_INTEL → ASSESS_POSITION → CHECK_SR → GEN
 | 2026-05-28 | Added `work/` directory structure and `--check` command |
 | 2026-07-01 | Created ACADEMY_CONTEXT.md and ME.md |
 | 2026-07-02 | Student started first assignment (w01_cmake) |
+| 2026-07-14 | Completed C++ W1 (CMake, Debug/Release, GTest) + DSA W1 (5 LC array problems) |
+| 2026-07-21 | Completed C++ W2 (Memory Model) + DSA W2 (5 LC string/hashing problems incl. 1 Hard) |
+| 2026-07-24 | First weekly report generated |
+| 2026-08-06 | Added Sprint traceability column to SR queue + Competitive Programming parallel track to DSA syllabus |
 
 ---
 
