@@ -46,6 +46,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from academy.fsm import AcademyFSM
 from academy.sm2 import SpacedRepetitionEngine
+from academy.llm import get_llm_client
 from academy.ollama import OllamaClient
 from academy.utils import (
     load_config,
@@ -151,29 +152,35 @@ def setup_logging(logs_dir: Path, verbose: bool = False) -> None:
     root_logger.addHandler(file_handler)
 
 
-def show_status(config: dict) -> None:
+def show_status(config: dict, provider_override: str = None) -> None:
     """Show current system status without calling the LLM."""
+    provider = provider_override or config.get("llm_provider", "ollama")
+
     print("\n" + "=" * 60)
     print("  PROJECT ACADEMY — System Status")
     print("=" * 60)
     print(f"\n  Date: {today_str()} ({get_day_of_week().capitalize()})")
     print(f"  Week: {get_week_number()}")
-    print(f"  Model: {config['model']}")
 
-    # Ollama status
-    client = OllamaClient(config)
-    ollama_ok = client.health_check()
-    model_ok = client.is_model_available() if ollama_ok else False
-    print(f"\n  Ollama: {'✅ Running' if ollama_ok else '❌ Not running'}")
-    print(f"  Model:  {'✅ Available' if model_ok else '❌ Not pulled'}")
+    if provider == "agent":
+        print(f"  Backend:  🤖 Agent (Antigravity IDE / Zero-GPU Mode)")
+        print(f"  Status:   ✅ Ready (no local Ollama daemon required)")
+    else:
+        print(f"  Backend:  💻 Ollama (Local Quantized Inference)")
+        print(f"  Model:    {config.get('model', 'qwen2.5-coder:14b')}")
 
-    # CUDA conflict check
-    if ollama_ok:
-        cuda_warning = client.check_cuda_conflict()
-        if cuda_warning:
-            print(f"  GPU:    ⚠️  Conflict detected (close 'ollama run' sessions)")
-        else:
-            print(f"  GPU:    ✅ Available")
+        client = get_llm_client(config, provider_override="ollama")
+        ollama_ok = client.health_check()
+        model_ok = client.is_model_available() if ollama_ok else False
+        print(f"\n  Ollama:   {'✅ Running' if ollama_ok else '❌ Not running'}")
+        print(f"  Model:    {'✅ Available' if model_ok else '❌ Not pulled'}")
+
+        if ollama_ok:
+            cuda_warning = client.check_cuda_conflict()
+            if cuda_warning:
+                print(f"  GPU:      ⚠️  Conflict detected (close 'ollama run' sessions)")
+            else:
+                print(f"  GPU:      ✅ Available")
 
     # Journal status
     state_dir = resolve_path(config["paths"]["state_dir"])
@@ -381,9 +388,25 @@ def main():
         help="Pre-load model into VRAM (avoids cold-start delay)",
     )
     parser.add_argument(
+        "--provider",
+        choices=["ollama", "agent"],
+        default=None,
+        help="Inference backend: 'ollama' (local) or 'agent' (Antigravity IDE)",
+    )
+    parser.add_argument(
+        "--agent",
+        action="store_true",
+        help="Run in Agent mode (shortcut for --provider agent)",
+    )
+    parser.add_argument(
         "--check",
         action="store_true",
         help="Validate your work against the active sprint",
+    )
+    parser.add_argument(
+        "--force", "-f",
+        action="store_true",
+        help="Force sprint generation even on rest days",
     )
 
     args = parser.parse_args()
@@ -392,9 +415,12 @@ def main():
     config = load_config(args.config)
     logs_dir = resolve_path(config["paths"]["logs_dir"])
 
+    # Determine active provider
+    active_provider = "agent" if args.agent else args.provider
+
     # Handle status check (no logging setup needed)
     if args.status:
-        show_status(config)
+        show_status(config, provider_override=active_provider)
         return
 
     # Handle manual SR addition
@@ -435,21 +461,33 @@ def main():
     logger = logging.getLogger("academy")
 
     # Print banner
+    provider_name = active_provider or config.get("llm_provider", "ollama")
     print("\n" + "=" * 50)
     print("  🎓 PROJECT ACADEMY")
-    print(f"  Mode: {args.mode.upper()}")
-    print(f"  Date: {today_str()} ({get_day_of_week().capitalize()})")
+    print(f"  Mode:     {args.mode.upper()}")
+    print(f"  Provider: {provider_name.upper()}")
+    print(f"  Date:     {today_str()} ({get_day_of_week().capitalize()})")
     print("=" * 50 + "\n")
 
     # Run the FSM
-    fsm = AcademyFSM(config_path=args.config, mode=args.mode)
+    fsm = AcademyFSM(
+        config_path=args.config,
+        mode=args.mode,
+        provider=active_provider,
+        force=args.force,
+    )
     success = fsm.run()
 
     if success:
         print("\n✅ Academy cycle complete.")
         if args.mode == "sprint":
             sprint_path = resolve_path(config["paths"]["state_dir"]) / "active_sprint.md"
-            print(f"📋 Your sprint is ready: {sprint_path}")
+            if provider_name == "agent":
+                agent_prompt_path = resolve_path(config["paths"]["logs_dir"]) / "agent_prompt.md"
+                print(f"🤖 Agent Prompt generated: {agent_prompt_path}")
+                print(f"📋 Final sprint output:    {sprint_path}")
+            else:
+                print(f"📋 Your sprint is ready: {sprint_path}")
         elif args.mode == "review":
             report_path = resolve_path(config["paths"]["state_dir"]) / "weekly_report.md"
             print(f"📊 Weekly review written: {report_path}")

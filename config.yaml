@@ -2,7 +2,13 @@
 # Project Academy — Configuration
 # ============================================================
 
-# --- Ollama / LLM ---
+# --- LLM Provider / Inference Backend ---
+# Options:
+#   "ollama" - Local, offline inference using quantized models (default showcase)
+#   "agent"  - Zero-GPU headless/IDE agent mode (uses Antigravity agent)
+llm_provider: "ollama"
+
+# --- Ollama / Local Model Settings ---
 ollama_url: "http://localhost:11434"
 model: "qwen2.5-coder:7b"
 context_window: 8192

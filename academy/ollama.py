@@ -10,18 +10,21 @@ import logging
 import requests
 from requests.exceptions import ConnectionError, Timeout, RequestException
 
+from academy.llm import BaseLLMClient, LLMError
+
 logger = logging.getLogger("academy")
 
 
-class OllamaError(Exception):
+class OllamaError(LLMError):
     """Raised when Ollama communication fails."""
     pass
 
 
-class OllamaClient:
+class OllamaClient(BaseLLMClient):
     """Client for the Ollama REST API."""
 
     def __init__(self, config: dict):
+        super().__init__(config)
         self.base_url = config.get("ollama_url", "http://localhost:11434")
         self.model = config.get("model", "qwen2.5-coder:14b")
         self.context_window = config.get("context_window", 8192)

@@ -32,7 +32,8 @@ from academy.utils import (
     get_week_number,
 )
 from academy.sm2 import SpacedRepetitionEngine
-from academy.ollama import OllamaClient, OllamaError
+from academy.llm import get_llm_client, BaseLLMClient, LLMError
+from academy.ollama import OllamaError
 from academy.report import generate_weekly_report, collect_week_journals, compute_faculty_hours, get_current_week_range
 
 logger = logging.getLogger("academy")
@@ -58,14 +59,18 @@ class AcademyFSM:
         "ERROR",
     ]
 
-    def __init__(self, config_path: Path = None, mode: str = "sprint"):
+    def __init__(self, config_path: Path = None, mode: str = "sprint", provider: str = None, force: bool = False):
         """
         Args:
             config_path: Path to config.yaml (defaults to project root).
             mode: 'sprint' for daily sprint generation, 'review' for weekly review.
+            provider: LLM provider override ('ollama' or 'agent').
+            force: Force sprint generation even on configured rest days.
         """
         self.config = load_config(config_path)
         self.mode = mode
+        self.provider = provider or self.config.get("llm_provider", "ollama")
+        self.force = force
         self.state = "IDLE"
 
         # Resolve paths
@@ -99,7 +104,8 @@ class AcademyFSM:
         self.sr_engine = SpacedRepetitionEngine(
             self.state_dir / "spaced_repetition.md", self.config
         )
-        self.ollama = OllamaClient(self.config)
+        self.llm = get_llm_client(self.config, provider_override=self.provider)
+        self.ollama = self.llm  # Backwards compatibility alias
 
         # Output buffer
         self.output = ""
@@ -116,8 +122,8 @@ class AcademyFSM:
         logger.info(f"Date: {today_str()}, Day: {get_day_of_week()}")
 
         # Check rest day
-        if self._is_rest_day() and self.mode == "sprint":
-            logger.info("Today is a rest day. Processing intel only (if any).")
+        if self._is_rest_day() and self.mode == "sprint" and not self.force:
+            logger.info("Today is a rest day. Processing intel only (if any). Use --force to generate a sprint.")
             # On rest days, only process intel drops — no sprint
             if not is_file_empty_or_placeholder(self.intel_drop_path):
                 self.state = "PROCESS_INTEL"
@@ -178,23 +184,23 @@ class AcademyFSM:
 
     def _state_idle(self) -> str:
         """Check preconditions and decide whether to start a cycle."""
-        # Pre-flight: check Ollama
-        if not self.ollama.health_check():
+        # Pre-flight: check LLM backend
+        if not self.llm.health_check():
             self.error_message = (
-                "Ollama is not running. Start it with: ollama serve\n"
-                f"Expected at: {self.config['ollama_url']}"
+                f"LLM backend '{self.provider}' is not available/running.\n"
+                f"Expected at: {self.config.get('ollama_url', 'http://localhost:11434')}"
             )
             return "ERROR"
 
-        if not self.ollama.is_model_available():
+        if not self.llm.is_model_available():
             self.error_message = (
-                f"Model '{self.config['model']}' not found. Pull it with:\n"
-                f"ollama pull {self.config['model']}"
+                f"Model '{self.config.get('model')}' not found. Pull it with:\n"
+                f"ollama pull {self.config.get('model')}"
             )
             return "ERROR"
 
-        # Pre-flight: check for CUDA conflicts
-        cuda_warning = self.ollama.check_cuda_conflict()
+        # Pre-flight: check for CUDA conflicts (if applicable)
+        cuda_warning = self.llm.check_cuda_conflict()
         if cuda_warning:
             logger.warning(cuda_warning)
 
@@ -267,7 +273,7 @@ class AcademyFSM:
         )
 
         try:
-            analysis = self.ollama.generate(prompt, system_prompt)
+            analysis = self.llm.generate(prompt, system_prompt)
             write_file(
                 self.intel_analysis_path,
                 f"# Intel Analysis — {today_str()}\n\n"
@@ -293,7 +299,7 @@ class AcademyFSM:
 
             logger.info("Intel analysis complete and archived.")
 
-        except OllamaError as e:
+        except LLMError as e:
             logger.error(f"Intel analysis failed: {e}")
             # Non-fatal — continue to sprint generation
 
@@ -395,8 +401,12 @@ class AcademyFSM:
         )
 
         try:
-            self.output = self.ollama.generate(prompt, system_prompt)
+            self.output = self.llm.generate(prompt, system_prompt)
             logger.info(f"Sprint generated: {len(self.output)} chars")
+
+            # In agent mode, skip quality gate because prompt was exported to agent_prompt.md
+            if self.provider == "agent":
+                return "WRITE_OUTPUT"
 
             # Quality gate: validate output before writing
             quality_ok, quality_msg = self._validate_sprint_quality(self.output)
@@ -404,7 +414,7 @@ class AcademyFSM:
                 logger.warning(f"Sprint quality check failed: {quality_msg}")
                 logger.info("Retrying sprint generation (attempt 2/2)...")
                 try:
-                    self.output = self.ollama.generate(prompt, system_prompt)
+                    self.output = self.llm.generate(prompt, system_prompt)
                     quality_ok, quality_msg = self._validate_sprint_quality(
                         self.output
                     )
@@ -417,7 +427,7 @@ class AcademyFSM:
                             f"> ⚠️ **Quality Warning:** {quality_msg}\n\n"
                             + self.output
                         )
-                except OllamaError as retry_err:
+                except LLMError as retry_err:
                     logger.error(f"Retry failed: {retry_err}")
                     # Use the first attempt's output with a warning
                     self.output = (
@@ -426,7 +436,7 @@ class AcademyFSM:
                     )
 
             return "WRITE_OUTPUT"
-        except OllamaError as e:
+        except LLMError as e:
             self.error_message = f"Sprint generation failed: {e}"
             return "ERROR"
 
@@ -523,8 +533,8 @@ class AcademyFSM:
         logger.info("Running weekly review...")
 
         # Pre-flight
-        if not self.ollama.health_check():
-            logger.error("Ollama not available for weekly review.")
+        if not self.llm.health_check():
+            logger.error(f"LLM backend '{self.provider}' not available for weekly review.")
             return False
 
         # Generate velocity report from archives
@@ -563,7 +573,7 @@ class AcademyFSM:
         )
 
         try:
-            review_output = self.ollama.generate(prompt, system_prompt)
+            review_output = self.llm.generate(prompt, system_prompt)
 
             # Write the combined report
             full_report = (
@@ -590,7 +600,7 @@ class AcademyFSM:
             logger.info("Weekly review complete.")
             return True
 
-        except OllamaError as e:
+        except LLMError as e:
             logger.error(f"Weekly review failed: {e}")
             # Still write the data-only report
             write_file(self.weekly_report_path, f"# Weekly Report\n\n{report}\n")
