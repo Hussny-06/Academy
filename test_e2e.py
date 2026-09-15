@@ -163,9 +163,12 @@ def test_full_cycle(dry_run: bool = False):
     config = load_config()
     state_dir = resolve_path(config["paths"]["state_dir"])
     journal_path = state_dir / "user_journal.md"
+    # Backup existing user journal if present
+    original_journal = read_file(journal_path)
 
-    # Write a test journal entry
-    test_journal = f"""---
+    try:
+        # Write a test journal entry
+        test_journal = f"""---
 date: {today_str()}
 faculty: cpp
 task_id: CPP-W01-D1
@@ -188,21 +191,23 @@ Created a basic build system with Debug and Release configurations.
 Had some trouble understanding the difference between -O2 and -O3 flags
 and when each is appropriate.
 """
-    write_file(journal_path, test_journal)
-    print("  [PASS] Test journal written")
+        write_file(journal_path, test_journal)
+        print("  [PASS] Test journal written")
 
-    if dry_run:
-        # Just test parsing, don't call LLM
-        from academy.utils import parse_frontmatter
-        fm, body = parse_frontmatter(test_journal)
-        print(f"  [DRY] Parsed journal: faculty={fm['faculty']}, "
-              f"status={fm['status']}, hours={fm['hours_spent']}")
-        print(f"  [DRY] Body length: {len(body)} chars")
-        print("  [DRY] Skipping LLM call. Use without --dry for full test.")
-
-        # Reset journal
-        reset_journal(journal_path)
-        return True
+        if dry_run:
+            # Just test parsing, don't call LLM
+            from academy.utils import parse_frontmatter
+            fm, body = parse_frontmatter(test_journal)
+            print(f"  [DRY] Parsed journal: faculty={fm['faculty']}, "
+                  f"status={fm['status']}, hours={fm['hours_spent']}")
+            print(f"  [DRY] Body length: {len(body)} chars")
+            print("  [DRY] Skipping LLM call. Use without --dry for full test.")
+            return True
+    finally:
+        if original_journal:
+            write_file(journal_path, original_journal)
+        else:
+            reset_journal(journal_path)
 
     # Run full FSM cycle with logging enabled
     import logging

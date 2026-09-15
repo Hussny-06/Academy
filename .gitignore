@@ -36,6 +36,8 @@ env/
 Thumbs.db
 desktop.ini
 
+# Personal Resume (Local only)
+resume/
 #Personal ScratchBook
 ME.md
 $.md

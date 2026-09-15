@@ -8,6 +8,7 @@ It reads your daily progress, identifies weak areas, schedules what to learn nex
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Ollama](https://img.shields.io/badge/LLM-Ollama-000000?logo=ollama&logoColor=white)](https://ollama.ai)
+[![Backend: Pluggable](https://img.shields.io/badge/Backend-Pluggable%20(Ollama%20%7C%20Agent)-blueviolet)](config.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
@@ -30,10 +31,11 @@ Project Academy is a **headless AI agent** that runs entirely on your machine. Y
 All of this happens in a single command:
 
 ```bash
-python orchestrator.py
+python orchestrator.py          # Local offline inference (Ollama)
+python orchestrator.py --agent  # Zero-GPU Agent mode (Antigravity IDE)
 ```
 
-No cloud. No subscription. No internet required after setup.
+No mandatory cloud subscriptions. 100% offline-first design with pluggable backend execution.
 
 ---
 
@@ -251,8 +253,9 @@ AI Academy/
 │
 ├── academy/                     # Core engine
 │   ├── fsm.py                   # Finite state machine (8 states)
+│   ├── llm.py                   # Pluggable LLM provider abstraction (Base, Ollama, Agent)
 │   ├── sm2.py                   # SM-2 spaced repetition engine
-│   ├── ollama.py                # Ollama HTTP client
+│   ├── ollama.py                # Ollama HTTP client (subclasses BaseLLMClient)
 │   ├── report.py                # Weekly report generator
 │   └── utils.py                 # YAML, markdown, file I/O
 │
@@ -293,12 +296,13 @@ AI Academy/
 | Layer | Choice | Why |
 |---|---|---|
 | **Runtime** | Python 3.11 | Simple, ubiquitous, fast enough for orchestration |
-| **LLM** | Ollama + `qwen2.5-coder:14b` | Free, local, code-specialized, fits in 6 GB VRAM |
+| **LLM Inference** | Pluggable Provider Pattern | Supports local quantized models (Ollama) & zero-GPU Agent modes |
+| **Local Model** | `qwen2.5-coder:7b` / `14b` | Free, local, code-specialized, fits in consumer VRAM |
 | **State** | Markdown + YAML frontmatter | Human-readable, git-friendly, zero setup |
 | **Dependencies** | `pyyaml` + `requests` | Intentionally minimal — 2 packages total |
 | **Scheduling** | Windows Task Scheduler | Native, reliable, no extra dependencies |
 
-**Design philosophy:** No database. No Docker. No framework. Just Python reading and writing markdown files, with one HTTP call to a local LLM. The entire system is understandable in an afternoon.
+**Design philosophy:** Pluggable AI backend. No database. No Docker. No framework. Just Python reading and writing markdown files, deterministic state transitions, and a clean inference abstraction. The entire system is understandable in an afternoon.
 
 ---
 
