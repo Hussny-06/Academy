@@ -9,6 +9,7 @@ It reads your daily progress, identifies weak areas, schedules what to learn nex
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Ollama](https://img.shields.io/badge/LLM-Ollama-000000?logo=ollama&logoColor=white)](https://ollama.ai)
 [![Backend: Pluggable](https://img.shields.io/badge/Backend-Pluggable%20(Ollama%20%7C%20Agent)-blueviolet)](config.yaml)
+[![AI: Agentic Orchestration](https://img.shields.io/badge/AI-Agentic%20Orchestration-orange?logo=openai&logoColor=white)](syllabus/syllabus_ai.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
@@ -193,11 +194,14 @@ Five handcrafted 52-week syllabi, each broken into 4 phases with weekly granular
 |---|---|---|---|
 | **C++ / Systems** | 35% | ~17h | Memory models → lock-free DS → kernel bypass → order book engine |
 | **DSA** | 25% | ~12h | Arrays → segment trees → 400+ LeetCode, CF 1600+ target |
-| **Edge AI / ML** | 15% | ~7h | PyTorch → ONNX → TensorRT → C++ inference server |
+| **Systems-Grade AI & Agent Orchestration** | 15% | ~7h | Attention/KV-Cache → ReAct & Function Calling → GraphRAG / MCP → Multi-Agent Swarms & FSMs |
 | **Data & Scale** | 12% | ~6h | SQL → Docker → Redis → system design → distributed KV store |
 | **Interview Prep** | 13% | ~6h | Resume → STAR behavioral → mock rounds → negotiation |
 
 Each syllabus has **checkboxes per topic** — the orchestrator parses these to know exactly where you are.
+
+> **💡 The Agentic Engineering Vision:**
+> Modern high-leverage software engineering requires orchestrating teams of specialized agents for planning, code generation, security auditing, and test verification. Because **Project Academy** is itself an autonomous career orchestration agent powered by a deterministic 8-state FSM and local inference, this curriculum creates complete synergy: you master the architectural patterns (ReAct loops, Pydantic function calling, GraphRAG, Anthropic's Model Context Protocol, and Docker sandboxes) by building the very systems that power the platform.
 
 ### 🧠 SM-2 Spaced Repetition
 
@@ -268,7 +272,7 @@ AI Academy/
 ├── syllabus/                    # 52-week curricula
 │   ├── syllabus_cpp.md          # C++ / Systems (288 lines)
 │   ├── syllabus_dsa.md          # DSA (316 lines)
-│   ├── syllabus_ai.md           # Edge AI / ML (207 lines)
+│   ├── syllabus_ai.md           # Systems-Grade AI & Agent Orchestration (244 lines)
 │   ├── syllabus_scale.md        # Data & Scale (207 lines)
 │   └── syllabus_interview.md    # Interview Prep (190 lines)
 │

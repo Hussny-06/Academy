@@ -31,7 +31,7 @@ faculties:
     weight: 0.25
     syllabus: "syllabus/syllabus_dsa.md"
   ai:
-    name: "Edge AI / ML"
+    name: "Agentic AI"
     weight: 0.15
     syllabus: "syllabus/syllabus_ai.md"
   scale:
